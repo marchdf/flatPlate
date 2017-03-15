@@ -1,0 +1,25 @@
+# -*- mode: yaml -*-
+#
+# Nalu Preprocessing Utility
+#
+
+# Mandatory section for Nalu preprocessing
+nalu_preprocess:
+  # Name of the input exodus database
+  input_db: grid_struct_35x25_vol.exo
+  # Name of the output exodus database
+  output_db: grid_struct_35x25_vol_ndtw.exo
+
+  # Nalu preprocessor expects a list of tasks to be performed on the mesh and
+  # field data structures
+  tasks:
+    - calc_ndtw2d
+
+  # Inputs for each "task" is organized under the section corresponding to the
+  # task name
+  calc_ndtw2d:
+    fluid_parts:
+      - Unspecified-2-HEX
+
+    wall_parts:
+      - bottomwall
