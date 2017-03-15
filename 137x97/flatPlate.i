@@ -145,6 +145,29 @@ realms:
         - input_variables_from_file:
             minimum_distance_to_wall: ndtw
 
+    data_probes:
+
+      output_frequency: 100
+
+      search_method: stk_octree
+      search_tolerance: 1.0e-3
+      search_expansion_factor: 2.0
+
+      specifications:
+        - name: probe_wall
+          from_target_part: bottomwall
+
+          line_of_site_specifications:
+            - name: results/probe_wall
+              number_of_points: 50
+              tip_coordinates: [0.0, 0.0, 0.0 ]
+              tail_coordinates: [2.0, 0.0, 0.0]
+              
+          output_variables:
+            - field_name: tau_wall
+              field_size: 1
+            - field_name: pressure
+              field_size: 1
 
     post_processing:
     
