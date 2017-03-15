@@ -2,7 +2,7 @@
 
 #PBS -l walltime=48:00:00  # WALLTIME limit
 #PBS -q batch  # queue
-#PBS -l nodes=2:ppn=24  # Number of nodes, put x processes on each
+#PBS -l nodes=4:ppn=24  # Number of nodes, put x processes on each
 #PBS -N flatPlate  # Name of job
 #PBS -A windFlowModeling  # Project handle
 #PBS -m ae  # Email at start/end of job
@@ -20,4 +20,4 @@ cd $PBS_O_WORKDIR
     module load python/2.7.8
 } &> /dev/null
 
-mpiexec -np 48 ${HOME}/Nalu/build/naluX -i flatPlate.i
+mpiexec -np 96 ${HOME}/Nalu/build/naluX -i flatPlate.i
