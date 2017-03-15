@@ -30,11 +30,11 @@ realms:
     use_edges: yes
     check_for_missing_bcs: yes
     automatic_decomposition_type: rcb
-    
+
     time_step_control:
      target_courant: 100.0
      time_step_change_factor: 1.2
-   
+
     equation_systems:
       name: theEqSys
       max_iterations: 2 
@@ -82,7 +82,8 @@ realms:
       target_name: bottomwall
       wall_user_data:
         velocity: [0,0,0]
-        use_wall_function: yes
+        turbulent_ke: 0.0
+        use_wall_function: no
 
     - inflow_boundary_condition: bc_inflow
       target_name: inlet

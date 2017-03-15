@@ -16,7 +16,7 @@ specified [here](https://turbmodels.larc.nasa.gov/flatplate_sst.html).
 
 1. Get CGNS mesh from [here](https://turbmodels.larc.nasa.gov/flatplate_grids.html)
 2. Use Pointwise to label the surfaces and set the BC
-3. Use Shreya's [near-distance-to-wall calculator](https://github.com/NaluCFD/NaluWindUtils) to get the NDTW
+3. Use Shreyas' [near-distance-to-wall calculator](https://github.com/NaluCFD/NaluWindUtils) to get the NDTW
 
 ## Running
 
