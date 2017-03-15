@@ -149,7 +149,7 @@ realms:
     post_processing:
     
     - type: surface
-      physics: surface_force_and_moment_wall_function
+      physics: surface_force_and_moment
       output_file_name: results/flatPlate.dat
       frequency: 25 
       parameters: [0,0]
