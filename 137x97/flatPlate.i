@@ -9,7 +9,7 @@ linear_solvers:
     type: tpetra
     method: gmres
     preconditioner: sgs
-    tolerance: 1e-3
+    tolerance: 1e-5
     max_iterations: 50
     kspace: 50
     output_level: 0
@@ -32,7 +32,7 @@ realms:
     automatic_decomposition_type: rcb
 
     time_step_control:
-     target_courant: 100.0
+     target_courant: 4.0
      time_step_change_factor: 1.2
 
     equation_systems:
@@ -54,7 +54,7 @@ realms:
 
         - ShearStressTransport:
             name: mySST 
-            max_iterations: 1
+            max_iterations: 3
             convergence_tolerance: 1e-5
 
     initial_conditions:
@@ -202,7 +202,7 @@ Time_Integrators:
       name: ti_1
       start_time: 0
       time_step: 1.0e-10
-      termination_time: 10.0 
+      termination_time: 0.5 
       time_stepping_type: adaptive
       time_step_count: 0
 
