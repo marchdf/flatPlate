@@ -8,26 +8,10 @@
 import argparse
 import os
 import numpy as np
-import matplotlib.pyplot as plt
 import pandas as pd
 import netCDF4 as nc
 import glob
 import yaml
-
-# ========================================================================
-#
-# Some defaults variables
-#
-# ========================================================================
-plt.rc('text', usetex=True)
-plt.rc('font', family='serif', serif='Times')
-cmap_med = ['#F15A60', '#7AC36A', '#5A9BD4', '#FAA75B',
-            '#9E67AB', '#CE7058', '#D77FB4', '#737373']
-cmap = ['#EE2E2F', '#008C48', '#185AA9', '#F47D23',
-        '#662C91', '#A21D21', '#B43894', '#010202']
-dashseq = [(None, None), [10, 5], [10, 4, 3, 4], [
-    3, 3], [10, 4, 3, 4, 3, 4], [3, 3], [3, 3]]
-markertype = ['s', 'd', 'o', 'p', 'h']
 
 
 # ========================================================================
@@ -148,7 +132,10 @@ if __name__ == '__main__':
         dfw = get_wall_values(enames)
 
         # Get integrated wall values
-        df = pd.read_csv(fname, delim_whitespace=True)
+        cnames = ["Time", "Fpx", "Fpy", "Fpz", "Fvx", "Fvy",
+                  "Fvz", "Mtx", "Mty", "Mtz", "Y+min", "Y+max"]
+        df = pd.read_csv(fname, delim_whitespace=True,
+                         header=None, names=cnames)
 
         # Calculate coefficients
         df['cl'] = (df['Fpy'] + df['Fvy']) / (dynPres * area)
