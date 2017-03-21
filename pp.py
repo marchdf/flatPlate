@@ -132,10 +132,11 @@ if __name__ == '__main__':
         dfw = get_wall_values(enames)
 
         # Get integrated wall values
-        cnames = ["Time", "Fpx", "Fpy", "Fpz", "Fvx", "Fvy",
-                  "Fvz", "Mtx", "Mty", "Mtz", "Y+min", "Y+max"]
-        df = pd.read_csv(fname, delim_whitespace=True,
-                         header=None, names=cnames)
+        # cnames = ["Time", "Fpx", "Fpy", "Fpz", "Fvx", "Fvy",
+        #           "Fvz", "Mtx", "Mty", "Mtz", "Y+min", "Y+max"]
+        # df = pd.read_csv(fname, delim_whitespace=True,
+        #                  header=None, names=cnames)
+        df = pd.read_csv(fname, delim_whitespace=True)
 
         # Calculate coefficients
         df['cl'] = (df['Fpy'] + df['Fvy']) / (dynPres * area)

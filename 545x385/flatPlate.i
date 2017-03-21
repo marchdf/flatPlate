@@ -145,6 +145,9 @@ realms:
         - input_variables_from_file:
             minimum_distance_to_wall: ndtw
 
+        - turbulence_model_constants:
+            SDRWallFactor: 10.0
+
     data_probes:
 
       output_frequency: 100
