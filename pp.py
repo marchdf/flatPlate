@@ -12,6 +12,7 @@ import pandas as pd
 import netCDF4 as nc
 import glob
 import yaml
+import scipy.integrate as spi
 
 
 # ========================================================================
@@ -45,7 +46,7 @@ def get_wall_values(enames):
 
     # Loop on variables
     for ename in enames:
-        dat = nc.MFDataset(ename)
+        dat = nc.Dataset(ename)
 
         ssn = ["%s" % nc.chartostring(ss)
                for ss in dat.variables['ss_names'][:]]
@@ -87,7 +88,59 @@ def get_wall_values(enames):
     dfw = pd.concat(lst, ignore_index=True)
     dfw = dfw.sort_values(by=['x'])
     dfw = dfw.drop_duplicates(subset='x')
-    return dfw
+    return dfw.reset_index()
+
+
+# ========================================================================
+def get_ux_front(enames):
+    """Get ux on the front from Exodus file."""
+
+    lst = []
+
+    for ename in enames:
+        dat = nc.Dataset(ename)
+
+        ssn = ["%s" % nc.chartostring(ss)
+               for ss in dat.variables['ss_names'][:]]
+        vn = ["%s" % nc.chartostring(nn)
+              for nn in dat.variables['name_nod_var'][:]]
+
+        idx_front = ssn.index("b'front'")
+        idx_ux = vn.index("b'velocity_x'")
+
+        try:
+            front_elem_idx = dat.variables[
+                'elem_ss{0:d}'.format(idx_front + 1)][:] - 1
+        except:
+            continue
+
+        front_connect1 = dat.variables['connect1'][
+            front_elem_idx].flatten() - 1
+        front_coordx = dat.variables['coordx'][front_connect1]
+        front_coordy = dat.variables['coordy'][front_connect1]
+        front_coordz = dat.variables['coordz'][front_connect1]
+
+        actual_idx = np.where(front_coordy >= 0.0)
+        front_x = front_coordx[actual_idx]
+        front_y = front_coordy[actual_idx]
+        front_z = front_coordz[actual_idx]
+        front_connect1 = front_connect1[actual_idx]
+
+        front_ux = dat.variables[
+            'vals_nod_var{0:d}'.format(idx_ux + 1)][-1, front_connect1]
+
+        colnames = ['x', 'z', 'ux']
+        df = pd.DataFrame(data=np.vstack((front_x, front_z, front_ux)).T,
+                          columns=colnames)
+        lst.append(df)
+
+    # Save
+    dfu = pd.concat(lst, ignore_index=True)
+    dfu.x[np.fabs(dfu['x']) < 1e-14] = 0.0  # make true zeros
+    dfu = dfu.sort_values(by=['x', 'z'])
+    dfu = dfu.drop_duplicates(subset=['x', 'z'])
+    dfu = dfu[dfu['x'] >= 0]  # remove everything before the plate
+    return dfu.reset_index()
 
 
 # ========================================================================
@@ -120,6 +173,7 @@ if __name__ == '__main__':
         yname = os.path.join(fdir, 'flatPlate.i')
         enames = glob.glob(os.path.join(rdir, 'flatPlate.e*'))
         owname = os.path.join(rdir, 'wall_coeffs.dat')
+        ouname = os.path.join(rdir, 'yp_up.dat')
 
         # Derived quantities
         L = 2.0
@@ -128,14 +182,11 @@ if __name__ == '__main__':
         u0, rho0, mu = parse_ic(yname)
         dynPres = rho0 * 0.5 * u0 * u0
 
-        # Get wall values
+        # ---------------------------------------------
+        # Get wall values, coefficients, etc
         dfw = get_wall_values(enames)
 
         # Get integrated wall values
-        # cnames = ["Time", "Fpx", "Fpy", "Fpz", "Fvx", "Fvy",
-        #           "Fvz", "Mtx", "Mty", "Mtz", "Y+min", "Y+max"]
-        # df = pd.read_csv(fname, delim_whitespace=True,
-        #                  header=None, names=cnames)
         df = pd.read_csv(fname, delim_whitespace=True)
 
         # Calculate coefficients
@@ -147,13 +198,38 @@ if __name__ == '__main__':
         cf_slice = np.interp(xslice, dfw['x'], dfw['cf'])
         cp_slice = np.interp(xslice, dfw['x'], dfw['cp'])
 
-        # Save them for later
+        # ---------------------------------------------
+        # Also calculate Re_theta and u+
+        dfu = get_ux_front(enames)
+
+        # Reshapes
+        res = [int(s) for s in ppdir.split('x')]
+        nx, nz = int(dfu.shape[0] / res[1]), res[1]
+        x = dfu['x'].values.reshape((nx, nz))
+        z = dfu['z'].values.reshape((nx, nz))
+        ux = dfu['ux'].values.reshape((nx, nz))
+
+        # Integrate to get theta and other quantities (and save)
+        dfw['theta'] = spi.simps(ux / u0 * (1 - ux / u0), z, axis=1)
+        dfw['retheta'] = rho0 * u0 * dfw['theta'] / mu
+
+        # Get y+ and u+ at Re-theta = 10000 (or next best thing)
+        idx = np.argmin(np.fabs(dfw['retheta'] - 10000))
+        up = ux[idx, :] / np.sqrt(dfw['tau_wall'][idx] / rho0)
+        yp = z[idx, :] * np.sqrt(dfw['tau_wall'][idx] / rho0) / (mu / rho0)
+
+        odf = pd.DataFrame(data=np.vstack((z[idx, :], yp, up)).T,
+                           columns=['z', 'yp', 'up'])
+
+        # ---------------------------------------------
+        # Save
         res = [float(s) for s in ppdir.split('x')]
         N2 = (res[0] - 1) * (res[1] - 1)
         h = np.sqrt(1. / N2)
         dfc.loc[ppdir] = [N2, h, cf_slice, cp_slice,
                           df['cd'].iloc[-1], df['cl'].iloc[-1]]
         dfw.to_csv(owname, index=False)
+        odf.to_csv(ouname, index=False)
 
     # Save the coefficients in a convenient table
     dfc.to_csv(ocname)

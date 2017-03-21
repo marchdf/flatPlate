@@ -51,46 +51,24 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     # ========================================================================
-    # Nalu output
-    fname = 'coeffs.dat'
-    df = pd.read_csv(fname)
-    df['h'] = np.sqrt(1. / df['N2'])
-
-    plt.figure(0)
-    plt.semilogx(df['h'], df['cd'], lw=2, color=cmap[0])
-    plt.semilogx(df['h'], df['cd'], markertype[0],
-                 mec=cmap[0], mfc=cmap[0], ms=10)
-
-    plt.figure(1)
-    plt.semilogx(np.sqrt(df['h']), df['cf'], lw=2, color=cmap[0])
-    plt.semilogx(np.sqrt(df['h']), df['cf'], markertype[0],
-                 mec=cmap[0], mfc=cmap[0], ms=10)
-
-    # wall cf
-    df = pd.read_csv('545x385/results/wall_coeffs.dat')
-    plt.figure(2)
-    plt.plot(df['x'], df['cf'], lw=2, color=cmap[0])
-
-    # ========================================================================
     # NASA CFL3D output
     fname = os.path.join(os.path.abspath('nasa_data'), 'coeffs_cfl3d.dat')
     df = pd.read_csv(fname)
 
     plt.figure(0)
-    plt.semilogx(df['h'], df['cd'], lw=2, color=cmap[1])
-    plt.semilogx(df['h'], df['cd'], markertype[1],
-                 mec=cmap[1], mfc=cmap[1], ms=10)
+    plt.semilogx(df['h'], df['cd'], lw=2, color=cmap[0], marker=markertype[0],
+                 mec=cmap[0], mfc=cmap[0], ms=10, label='NASA CFL3D')
 
     plt.figure(1)
-    plt.semilogx(np.sqrt(df['h']), df['cf'], lw=2, color=cmap[1])
-    plt.semilogx(np.sqrt(df['h']), df['cf'], markertype[1],
-                 mec=cmap[1], mfc=cmap[1], ms=10)
+    plt.semilogx(df['h'], df['cf'], lw=2, color=cmap[0], marker=markertype[0],
+                 mec=cmap[0], mfc=cmap[0], ms=10, label='NASA CFL3D')
 
     # wall cf
     fname = os.path.join(os.path.abspath('nasa_data'), 'wall_cf_cfl3d.dat')
     df = pd.read_csv(fname)
     plt.figure(2)
-    plt.plot(df['x'], df['cf'], lw=2, color=cmap[1])
+    p = plt.plot(df['x'], df['cf'], lw=2, color=cmap[0], label='NASA CFL3D')
+    p[0].set_dashes(dashseq[0])
 
     # ========================================================================
     # NASA FUN3D output
@@ -98,20 +76,38 @@ if __name__ == '__main__':
     df = pd.read_csv(fname)
 
     plt.figure(0)
-    plt.semilogx(df['h'], df['cd'], lw=2, color=cmap[2])
-    plt.semilogx(df['h'], df['cd'], markertype[2],
-                 mec=cmap[2], mfc=cmap[2], ms=10)
+    plt.semilogx(df['h'], df['cd'], lw=2, color=cmap[1], marker=markertype[1],
+                 mec=cmap[1], mfc=cmap[1], ms=10, label='NASA FUN3D')
 
     plt.figure(1)
-    plt.semilogx(np.sqrt(df['h']), df['cf'], lw=2, color=cmap[2])
-    plt.semilogx(np.sqrt(df['h']), df['cf'], markertype[2],
-                 mec=cmap[2], mfc=cmap[2], ms=10)
+    plt.semilogx(df['h'], df['cf'], lw=2, color=cmap[1], marker=markertype[1],
+                 mec=cmap[1], mfc=cmap[1], ms=10, label='NASA FUN3D')
 
     # wall cf
     fname = os.path.join(os.path.abspath('nasa_data'), 'wall_cf_fun3d.dat')
     df = pd.read_csv(fname)
     plt.figure(2)
-    plt.plot(df['x'], df['cf'], lw=2, color=cmap[2])
+    p = plt.plot(df['x'], df['cf'], lw=2, color=cmap[1], label='NASA FUN3D')
+    p[0].set_dashes(dashseq[1])
+
+    # ========================================================================
+    # Nalu output
+    fname = 'coeffs.dat'
+    df = pd.read_csv(fname)
+
+    plt.figure(0)
+    plt.semilogx(df['h'], df['cd'], ls='-', lw=2, color=cmap[2],
+                 marker=markertype[2], mec=cmap[2], mfc=cmap[2], ms=10, label='Nalu')
+
+    plt.figure(1)
+    plt.semilogx(df['h'], df['cf'], ls='-', lw=2, color=cmap[2],
+                 marker=markertype[2], mec=cmap[2], mfc=cmap[2], ms=10, label='Nalu')
+
+    # wall cf
+    df = pd.read_csv('545x385/results/wall_coeffs.dat')
+    plt.figure(2)
+    p = plt.plot(df['x'], df['cf'], lw=2, color=cmap[2], label='Nalu')
+    p[0].set_dashes(dashseq[2])
 
     # ========================================================================
     # Format the plots
@@ -121,8 +117,10 @@ if __name__ == '__main__':
     plt.ylabel(r"$C_d$", fontsize=22, fontweight='bold')
     plt.setp(ax.get_xmajorticklabels(), fontsize=18, fontweight='bold')
     plt.setp(ax.get_ymajorticklabels(), fontsize=18, fontweight='bold')
+    legend = ax.legend(loc='best')
     plt.tight_layout()
     plt.savefig('cd.pdf', format='pdf')
+    plt.savefig('cd.png', format='png')
 
     plt.figure(1)
     ax = plt.gca()
@@ -130,8 +128,10 @@ if __name__ == '__main__':
     plt.ylabel(r"$C_f$", fontsize=22, fontweight='bold')
     plt.setp(ax.get_xmajorticklabels(), fontsize=18, fontweight='bold')
     plt.setp(ax.get_ymajorticklabels(), fontsize=18, fontweight='bold')
+    legend = ax.legend(loc='best')
     plt.tight_layout()
     plt.savefig('cf.pdf', format='pdf')
+    plt.savefig('cf.png', format='png')
 
     plt.figure(2)
     ax = plt.gca()
@@ -140,8 +140,10 @@ if __name__ == '__main__':
     plt.setp(ax.get_xmajorticklabels(), fontsize=18, fontweight='bold')
     plt.setp(ax.get_ymajorticklabels(), fontsize=18, fontweight='bold')
     plt.ylim([0.002, 0.006])
+    legend = ax.legend(loc='best')
     plt.tight_layout()
     plt.savefig('wall_cf.pdf', format='pdf')
+    plt.savefig('wall_cf.png', format='png')
 
     if args.show:
         plt.show()
