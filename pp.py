@@ -158,7 +158,8 @@ if __name__ == '__main__':
 
     # ========================================================================
     # Setup
-    ppdirs = ['35x25', "69x49", "137x97", "273x193", "545x385"]
+    #ppdirs = ['35x25', "69x49", "137x97", "273x193", "545x385"]
+    ppdirs = ["69x49"]
     fdirs = [os.path.abspath(fdir) for fdir in ppdirs]
     rdirs = [os.path.join(fdir, 'results') for fdir in fdirs]
     ocname = os.path.join(os.path.abspath('.'), 'coeffs.dat')
@@ -210,7 +211,14 @@ if __name__ == '__main__':
         ux = dfu['ux'].values.reshape((nx, nz))
 
         # Integrate to get theta and other quantities (and save)
-        dfw['theta'] = spi.simps(ux / u0 * (1 - ux / u0), z, axis=1)
+        # The integral bound is where u is less than 99.5% of the freestream
+        # velocity
+        theta = []
+        for i in range(ux.shape[0]):
+            idx = ux[i, :] < 0.995 * u0
+            theta.append(spi.simps(ux[i, idx] / u0 *
+                                   (1 - ux[i, idx] / u0), z[i, idx]))
+        dfw['theta'] = theta
         dfw['retheta'] = rho0 * u0 * dfw['theta'] / mu
 
         # Get y+ and u+ at Re-theta = 10000 (or next best thing)

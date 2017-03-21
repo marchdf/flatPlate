@@ -87,24 +87,24 @@ if __name__ == '__main__':
                  color=cmap[1], label='NASA CFL3D')
     p[0].set_dashes(dashseq[1])
 
-    # # ======================================================================
-    # # Nalu output
-    # fname = 'coeffs.dat'
-    # df = pd.read_csv(fname)
+    # ======================================================================
+    # Nalu output
+    fname = os.path.join(os.path.abspath('545x385/results'), 'wall_coeffs.dat')
+    df = pd.read_csv(fname)
 
-    # plt.figure(0)
-    # plt.semilogx(df['h'], df['cd'], ls='-', lw=2, color=cmap[2],
-    # marker=markertype[2], mec=cmap[2], mfc=cmap[2], ms=10, label='Nalu')
+    plt.figure(0)
+    p = plt.plot(df['retheta'], df['cf'], lw=2,
+                 color=cmap[2], label='Nalu')
+    p[0].set_dashes(dashseq[2])
 
-    # plt.figure(1)
-    # plt.semilogx(df['h'], df['cf'], ls='-', lw=2, color=cmap[2],
-    # marker=markertype[2], mec=cmap[2], mfc=cmap[2], ms=10, label='Nalu')
+    fname = os.path.join(os.path.abspath('545x385/results'), 'yp_up.dat')
+    df = pd.read_csv(fname)
+    df['log10yp'] = np.log10(df['yp'])
 
-    # # wall cf
-    # df = pd.read_csv('545x385/results/wall_coeffs.dat')
-    # plt.figure(2)
-    # p = plt.plot(df['x'], df['cf'], lw=2, color=cmap[2], label='Nalu')
-    # p[0].set_dashes(dashseq[2])
+    plt.figure(1)
+    p = plt.plot(df['log10yp'], df['up'], lw=2,
+                 color=cmap[2], label='Nalu')
+    p[0].set_dashes(dashseq[2])
 
     # ======================================================================
     # Format the plots
@@ -114,7 +114,8 @@ if __name__ == '__main__':
     plt.ylabel(r"$C_f$", fontsize=22, fontweight='bold')
     plt.setp(ax.get_xmajorticklabels(), fontsize=18, fontweight='bold')
     plt.setp(ax.get_ymajorticklabels(), fontsize=18, fontweight='bold')
-    ax.set_xlim([4000, 13000])
+    ax.set_xlim([4000, 14000])
+    ax.set_ylim([0.002, 0.004])
     legend = ax.legend(loc='best')
     plt.tight_layout()
     plt.savefig('retheta_cf.pdf', format='pdf')
