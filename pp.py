@@ -158,8 +158,7 @@ if __name__ == '__main__':
 
     # ========================================================================
     # Setup
-    #ppdirs = ['35x25', "69x49", "137x97", "273x193", "545x385"]
-    ppdirs = ["69x49"]
+    ppdirs = ['35x25', "69x49", "137x97", "273x193", "545x385"]
     fdirs = [os.path.abspath(fdir) for fdir in ppdirs]
     rdirs = [os.path.join(fdir, 'results') for fdir in fdirs]
     ocname = os.path.join(os.path.abspath('.'), 'coeffs.dat')
