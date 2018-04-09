@@ -37,7 +37,7 @@ linear_solvers:
 realms:
 
   - name: realm_1
-    mesh: grid_struct_35x25_vol_ndtw.exo
+    mesh: grid_struct_273x193_vol_ndtw.exo
     use_edges: no
     automatic_decomposition_type: rcb
 
@@ -131,6 +131,8 @@ realms:
       name: myOptions
       turbulence_model: sst
 
+      use_consolidated_solver_algorithm: yes
+
       options:
         - hybrid_factor:
             velocity: 1.0
@@ -145,6 +147,12 @@ realms:
             velocity: yes
             turbulent_ke: yes
             specific_dissipation_rate: yes
+
+        - element_source_terms:
+            momentum: [momentum_time_derivative, advection_diffusion]
+            continuity: [advection]
+            turbulent_ke: [turbulent_ke_time_derivative, advection_diffusion, sst]
+            specific_dissipation_rate: [specific_dissipation_rate_time_derivative, advection_diffusion, sst]
 
         - projected_nodal_gradient:
             velocity: element

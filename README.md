@@ -33,7 +33,14 @@ B. Running
 mpiexec -np 1 ./naluX -i flatPlate.i
 ```
 
-## SST 
+C. Post-processing
+```
+./pp.py # reads Nalu data, generates tables of quantities of interest
+./plot_verification.py
+./plot_validation.py
+```
+
+## RANS SST 
 
 ### Verification
 

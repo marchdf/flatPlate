@@ -37,7 +37,7 @@ linear_solvers:
 realms:
 
   - name: realm_1
-    mesh: grid_struct_35x25_vol_ndtw.exo
+    mesh: grid_struct_273x193_vol_ndtw.exo
     use_edges: no
     automatic_decomposition_type: rcb
 
